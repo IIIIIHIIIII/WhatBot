@@ -7,6 +7,7 @@ import urllib
 import json
 import price
 import requests
+from config import config
 
 def getApiKey(name):
     cur.execute("select aes_decrypt(coinapi,'%s') from whatdata where user = '%s'" %(key,name))
@@ -311,9 +312,9 @@ def connectIO(pin,api):
     version = 2
     return BlockIo(api,pin,version)
     
-db = MySQLdb.connect(host="",user="",passwd="",db="")
+db = MySQLdb.connect(host=config["mysql"]["host"],user=config["mysql"]["user"],passwd=config["mysql"]["passwd"],db=config["mysql"]["db"])
 cur = db.cursor()
-blockApi = "" #Block.io api key
-pin = "" #Block.io pin
+blockApi = config["blockIO"]["apiKey"] #Block.io api key
+pin = config["blockIO"]["pin"] #Block.io pin
 blockIo = connectIO(pin,blockApi)
-key = ""  #AES key
+key = config["mysql"]["aesKey"] #AES key
