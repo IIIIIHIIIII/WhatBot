@@ -1,5 +1,6 @@
 # WhatBot
 
+Whatsapp CryptoBot.
 
 **Requirements:**
 - **Yowsup** - pip install yowsup2
@@ -9,6 +10,9 @@
 - **Requests** - pip install requests 
 
 **Setup:**
+
+. Update config.py with your details.
+
 
 . Create a mysql database with following schema:
 
