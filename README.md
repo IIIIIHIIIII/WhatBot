@@ -24,5 +24,5 @@ CREATE TABLE whatdata (
    balance  int(11) DEFAULT NULL,
    address  varchar(100) DEFAULT NULL,
    coinapi  varbinary(200) DEFAULT NULL
-) 
+);
 ```
