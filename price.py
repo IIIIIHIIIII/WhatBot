@@ -7,11 +7,11 @@ def getPrice():
     while True:
         global ui,iu,du,ud
         
-        value = untangle.parse("http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=USD&ToCurrency=INR").double.cdata
-        ui = value
+        #value = untangle.parse("http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=USD&ToCurrency=INR").double.cdata
+        #ui = value
         
-        value = untangle.parse("http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=INR&ToCurrency=USD").double.cdata
-        iu = value
+        #value = untangle.parse("http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=INR&ToCurrency=USD").double.cdata
+        #iu = value
 
         data = requests.get("https://www.cryptonator.com/api/ticker/doge-usd").json()
         price = data["ticker"]["price"]
@@ -22,7 +22,7 @@ def getPrice():
         ud = price
         time.sleep(450)
         
-ui = ""
-iu = ""
+ui = "0"
+iu = "0"
 du = ""
 ud = ""
