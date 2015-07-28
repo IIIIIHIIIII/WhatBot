@@ -7,11 +7,14 @@ def getPrice():
     while True:
         global ui,iu,du,ud
         
-        #value = untangle.parse("http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=USD&ToCurrency=INR").double.cdata
-        #ui = value
-        
-        #value = untangle.parse("http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=INR&ToCurrency=USD").double.cdata
-        #iu = value
+        page_data = requests.get("http://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=json").json()
+
+        for i in page_data['list']['resources']:
+            if(i["resource"]["fields"]["name"] == "USD/INR"):
+                ui = i["resource"]["fields"]["price"]
+                break
+            
+        iu = str(1 / float(ui))
 
         data = requests.get("https://www.cryptonator.com/api/ticker/doge-usd").json()
         price = data["ticker"]["price"]
