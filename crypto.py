@@ -2,6 +2,7 @@
 import urllib
 import json
 import requests
+import price
 
 def info():
     data = requests.get("https://api.coinsecure.in/v0/noauth/ticker").json()
@@ -50,13 +51,22 @@ def convert(text):
 
     coinA = text[2].upper()
     coinB = text[3].upper()
+    
+    if(coinB == "INR"):
+        inon = True
+        coinB = "USD"
 
     page = urllib.urlopen("https://www.cryptonator.com/api/ticker/%s-%s" %(coinA,coinB))
     page_data = json.loads(page.read().decode('utf-8'))
 
-
+    
+        
     if (page_data["error"]):
         return "%s" %(page_data["error"])
     else:
         value = float(page_data["ticker"]["price"])
+        if(inon):
+            inon = False
+            coinB = "INR"
+            value *= float(price.ui)
         return "%f %s = %f %s" %(ogValue,coinA,(ogValue * value),coinB)
