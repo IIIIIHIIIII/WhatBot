@@ -4,26 +4,46 @@ from yowsup.layers.protocol_acks.protocolentities      import OutgoingAckProtoco
 from yowsup.layers.protocol_receipts.protocolentities  import OutgoingReceiptProtocolEntity
 import tipbot
 import crypto
+import threading 
+import bitrefill
+import wiki
+import trivia
+import time
 
 class EchoLayer(YowInterfaceLayer):
 
+    disable = []
     def cleanList(self,text):
         while "" in text:
             text.remove("")
         return text
-        
     
+    def displayText(self,gotMessage,messageProtocolEntity):
+        reply = bitrefill.placeOrder(gotMessage,messageProtocolEntity.getFrom())
+        messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
+        self.disable.remove(messageProtocolEntity.getFrom())
+        self.toLower(messageEntity)
+    
+    def Timer(self,qfor,messageProtocolEntity):
+        time.sleep(25)
+        try:
+            trivia.answer[qfor]
+            del(trivia.answer[qfor])
+            reply = "Trivia timeout."
+            messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
+            self.toLower(messageEntity)
+        except KeyError:
+            pass
+        
     @ProtocolEntityCallback("message")
     def onMessage(self, messageProtocolEntity):
-        global disable
         if True:
             if messageProtocolEntity.getType() == 'text':
-                print messageProtocolEntity
                 receipt = OutgoingReceiptProtocolEntity(messageProtocolEntity.getId(), messageProtocolEntity.getFrom(), 'read', messageProtocolEntity.getParticipant())
                 self.toLower(receipt)
                 gotMessage = self.cleanList(messageProtocolEntity.getBody().split(" "))
 
-                if (messageProtocolEntity.getParticipant()):
+                if (messageProtocolEntity.getParticipant() and messageProtocolEntity.getParticipant() not in self.disable):
                     if(gotMessage[0] == "!register" and len(gotMessage) == 1):
                         reply = tipbot.register(messageProtocolEntity.getParticipant())
                         messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getParticipant())
@@ -68,6 +88,26 @@ class EchoLayer(YowInterfaceLayer):
                         reply = crypto.info()
                         messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
                         self.toLower(messageEntity)
+                    elif(gotMessage[0] == "!trivia" and len(gotMessage) == 1):
+                        reply = trivia.question(messageProtocolEntity.getFrom())
+                        messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
+                        self.toLower(messageEntity)
+                        threading.Thread(target=self.Timer,args=(messageProtocolEntity.getFrom(),messageProtocolEntity)).start()
+                    elif(gotMessage[0] == "!ans" and len(gotMessage) >= 2):
+                        result = trivia.ans(gotMessage[1:],messageProtocolEntity.getParticipant(),messageProtocolEntity.getFrom())
+                        if result:
+                            reply = "Correct!"
+                            messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
+                            self.toLower(messageEntity)
+                            reply = tipbot.tip(["",tipbot.getUserTag(messageProtocolEntity.getParticipant()).replace("Your tag : ",""),"10"],"919892633961@s.whatsapp.net")
+                            messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
+                            self.toLower(messageEntity)
+                    elif(gotMessage[0] == "!wiki" and len(gotMessage) >= 2):
+                        for i in range(2,len(gotMessage)):
+                            gotMessage[i] = gotMessage[i].capitalize()
+                        reply = wiki.getWiki("%20".join(gotMessage[1:]))
+                        messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
+                        self.toLower(messageEntity)
                     elif(gotMessage[0] == "!cbid" or gotMessage[0] == "!cask" and len(gotMessage) == 3):
                         if gotMessage[0] == "!cbid":
                             createType = "createbid"
@@ -92,7 +132,7 @@ class EchoLayer(YowInterfaceLayer):
                         reply = tipbot.coinbal(messageProtocolEntity.getParticipant(),baltype)
                         messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
                         self.toLower(messageEntity)
-                else:
+                elif(messageProtocolEntity.getFrom() not in self.disable):
                     if(gotMessage[0] == "!coinapi" and len(gotMessage) == 2):
                         reply = tipbot.coinAdd(gotMessage,messageProtocolEntity.getFrom())
                         messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
@@ -101,6 +141,9 @@ class EchoLayer(YowInterfaceLayer):
                         reply = tipbot.getCoinsecAddr(messageProtocolEntity.getFrom())
                         messageEntity = TextMessageProtocolEntity(reply,to = messageProtocolEntity.getFrom())
                         self.toLower(messageEntity)
+                    elif(gotMessage[0] == "!refill" and len(gotMessage) == 3):
+                        self.disable.append(messageProtocolEntity.getFrom())
+                        threading.Thread(target=self.displayText, args =(gotMessage,messageProtocolEntity)).start()
         self.toLower(messageProtocolEntity.ack())
         self.toLower(messageProtocolEntity.ack(True))
             
