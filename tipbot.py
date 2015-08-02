@@ -106,7 +106,7 @@ def rup(amount):
     return int(usddoge * value)
     
 def commands():
-    return("!register - Register accont.\n !balance - Check your balance. \n !tip - Tip others. \n !tag - Check your tag."
+    return("!register - Register account.\n !balance - Check your balance. \n !tip - Tip others. \n !tag - Check your tag."
     "\n !address - Check your address. \n !change - Change your tag. \n !market - check coin market. \n !convert - check n amount of coinA in coinB"
     "\n\n Coinsecure commands : \n!coinapi - Add coinsecure api. \n !cbid - Create bid. \n !dbid - Cancel bid. \n !cask - Create ask. \n !dask - Cancel ask"
     "\n!info - Check coinsecure market.\n !cbal - Check coin balance.\n !fbal - Check fiat balance.\n !addr - Get coinsecure address.")
@@ -144,10 +144,13 @@ def getUserAdd(name):
 
 def tip(text,name):
     ruppee = "off"
+    tags = {"tea":"5rs","beer":"100rs","vada-pav":"10rs","tandori":"200rs","biryani":"50rs"}
     if not(userExists(name)):
         return "Not registered. Use !register"
     else:
         try:
+            if text[2].lower() in tags:
+                text[2] = tags[text[2]]
             if "rs" in text[2]:
                 ruppee = "on"
                 text[2] = text[2].replace("rs","")
@@ -213,7 +216,7 @@ def withdraw(text,name):
     if not(userExists(name)):
         return "Not registered. Use !register"
     try:
-        amount = int(text[2])
+        amount = int(float(text[2]))
     except ValueError:
         return "Invalid amount : %r" %(text[2])
     if amount <= 0:
@@ -255,10 +258,8 @@ def balance(name,val):
     if not(userExists(name)):
         return "Not registered. Use !register"
     else:
-        print "here"
         pen = getBal(name,"pending")
         cur_bal = getBal(name,"")
-        print "got value"
         if val == "yes":
             return cur_bal
         
