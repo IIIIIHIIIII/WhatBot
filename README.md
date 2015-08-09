@@ -6,7 +6,6 @@ Whatsapp CryptoBot.
 - **Yowsup** - pip install yowsup2
 - **MySQLdb** - pip install mysql-python
 - **BlockIo** - pip install block-io
-- **Untangle** - pip install untangle
 - **Requests** - pip install requests 
 
 **Setup:**
